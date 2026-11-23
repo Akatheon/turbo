@@ -1,0 +1,64 @@
+# Akatheon Turbo. Copyright (c) 2026 Beaverise Inc. ("Akatheon"). All rights reserved. Patent Pending.
+# Use is governed by LICENSE.
+name: Akatheon Turbo
+description: Runs only the tests a change can affect, with a signed receipt of what ran and what was skipped
+author: Akatheon
+branding:
+  icon: zap
+  color: purple
+inputs:
+  mode:
+    description: "shadow (run everything, report what would have been skipped) | enforce (run the selected tests only) | record (certificates for this commit) | refresh (update the last certificates for this commit)"
+    default: shadow
+  command:
+    description: The test command as you run it today, for example "python -m pytest -n 4 tests"
+    required: true
+  file-mode:
+    description: "record and refresh: test files whose tests share an expensive fixture, one per line"
+    default: ""
+  certs-dir:
+    description: Where the certificates live on the runner
+    default: .akatheon-ci
+  base:
+    description: Override the revision the certificates describe (default - the one recorded with them)
+    default: ""
+  signing-key:
+    description: Ed25519 seed (64 hex characters) from a secret, to sign receipts; without one a fresh key signs
+    default: ""
+outputs:
+  selected:
+    description: Tests selected
+    value: ${{ steps.run.outputs.selected }}
+  known:
+    description: Tests with certificates
+    value: ${{ steps.run.outputs.known }}
+  receipt:
+    description: Path of the signed receipt
+    value: ${{ steps.run.outputs.receipt }}
+runs:
+  using: composite
+  steps:
+    - name: Restore certificates
+      if: inputs.mode != 'record'
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ inputs.certs-dir }}/certs.json
+        key: akatheon-ci-certs-${{ github.event.pull_request.base.sha || github.sha }}
+        restore-keys: akatheon-ci-certs-
+    - name: Akatheon Turbo
+      id: run
+      shell: bash
+      env:
+        AKCI_MODE: ${{ inputs.mode }}
+        AKCI_COMMAND: ${{ inputs.command }}
+        AKCI_FILE_MODE: ${{ inputs.file-mode }}
+        AKCI_CERTS_DIR: ${{ inputs.certs-dir }}
+        AKCI_BASE: ${{ inputs.base }}
+        AKCI_SIGNING_KEY: ${{ inputs.signing-key }}
+      run: bash "${{ github.action_path }}/run.sh"
+    - name: Save certificates
+      if: inputs.mode == 'record' || inputs.mode == 'refresh'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ inputs.certs-dir }}/certs.json
+        key: akatheon-ci-certs-${{ github.sha }}

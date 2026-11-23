@@ -1,0 +1,42 @@
+Akatheon Turbo - Proprietary CI Execution License
+
+Copyright (c) 2026 Beaverise Inc. ("Akatheon"). All rights reserved.
+Patent Pending - U.S. Provisional App. No. 64/178,842
+
+"Software" means the akatheon/turbo GitHub Action, the release archive it downloads, and every file, program,
+library and output (including certificates and receipts) they contain or produce.
+
+1. Grant. Subject to this License, Beaverise Inc. grants you a limited, revocable, non-exclusive, non-transferable
+   right to execute the Software, unmodified, within your own GitHub Actions or other CI workflows, and only while
+   one of the following applies to you: (a) an evaluation authorized by Beaverise Inc.; (b) Akatheon's free tier
+   for open-source projects; or (c) an active paid subscription. No other right is granted, by implication or
+   otherwise.
+
+2. Restrictions. You may not, and may not allow anyone else to:
+   (a) reverse engineer, decompile, disassemble, recover symbols from, or otherwise attempt to derive the source
+       code, structure or algorithms of the Software;
+   (b) unpack, extract or inspect the release archive or its contents other than by the Software's own execution
+       within a CI workflow;
+   (c) modify, adapt, translate or create derivative works of the Software;
+   (d) copy, redistribute, sublicense, sell, rent, lease, host or otherwise make the Software available to any
+       third party;
+   (e) use the Software, or its outputs or certificates, to build, train, calibrate or improve a competing
+       test-selection or CI product or service; or
+   (f) publish or disclose benchmarks or performance comparisons of the Software without the prior written
+       consent of Beaverise Inc.
+
+3. Ownership. The Software is licensed, not sold. Beaverise Inc. and its licensors keep all right, title and
+   interest in the Software, including all intellectual property rights.
+
+4. Termination. This License ends automatically if you breach it, and Beaverise Inc. may revoke it at any time by
+   notice. When it ends you must stop executing the Software and remove it from your workflows.
+
+5. No warranty. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+   WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. You are responsible for
+   the results of the tests you choose to run or skip.
+
+6. Limitation of liability. TO THE EXTENT PERMITTED BY LAW, BEAVERISE INC. IS NOT LIABLE FOR ANY INDIRECT,
+   INCIDENTAL, SPECIAL, CONSEQUENTIAL OR PUNITIVE DAMAGES, OR ANY LOSS OF DATA, PROFITS OR REVENUE, ARISING FROM
+   THE SOFTWARE OR THIS LICENSE.
+
+Licensing and written consents: https://akatheon.com
