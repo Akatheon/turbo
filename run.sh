@@ -4,8 +4,8 @@
 # Use is governed by LICENSE.
 set -euo pipefail
 
-VERSION=1.0.1
-SHA256=20762869247c12ff7fbde1684437df3d719ec5431da5e866173bf67a2915da8a
+VERSION=1.0.2
+SHA256=34a03c3b8de551cadf602a6630fec3e2ae167c52120736b0ace37d31559d24bd
 URL=${AKATHEON_TURBO_URL:-https://dl.akatheon.com/turbo/$VERSION/akatheon-turbo-$VERSION-linux-x86_64.tar.gz}
 
 if [ "$(uname -s)-$(uname -m)" != Linux-x86_64 ]; then
