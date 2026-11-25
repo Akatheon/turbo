@@ -32,7 +32,7 @@ inputs:
     description: "on (default with a key): the run's numeric summary (counts, seconds, commit and receipt hashes; never code, paths, test names or logs) goes to Akatheon, which also checks the subscription before the run | off (Enterprise keys only)"
     default: "on"
   job-key:
-    description: "Matrix workflows: ${{ toJSON(matrix) }}, so each matrix job's summary counts once"
+    description: "Matrix workflows: the matrix as JSON (toJSON of the matrix context, in an expression), so each matrix job's summary counts once"
     default: ""
   backstop:
     description: "none | merge-queue (on the merge queue's run, merge_group, every test runs as the last check before a merge)"
