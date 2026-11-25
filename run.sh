@@ -4,8 +4,8 @@
 # Use is governed by LICENSE.
 set -euo pipefail
 
-VERSION=1.1.0
-SHA256=c4ddad18d274c8ce87fd8fbd1e3a2dcde7a1e6035a208fbf949617849380b47d
+VERSION=1.2.0
+SHA256=993628b9cd2f15d3f2181183675f70b7dca9a67275997458f122b8b62adab057
 URL=${AKATHEON_TURBO_URL:-https://dl.akatheon.com/turbo/$VERSION/akatheon-turbo-$VERSION-linux-x86_64.tar.gz}
 
 if [ "$(uname -s)-$(uname -m)" != Linux-x86_64 ]; then
@@ -36,6 +36,5 @@ if EXCLUDE=$(git rev-parse --git-path info/exclude 2>/dev/null) && ! grep -qxF "
 fi
 
 export AKCI_PLUGIN_DIR="$DIR/poly"
-export AKCI_BINARY="$DIR/bin/akatheon-ci"
-export AKCI_VFS_LIB="$DIR/lib/libakatheon_vfs.so"
-exec bash "$DIR/run.sh"
+export AKCI_RT_LIB="$DIR/lib/libak_rt.so"
+exec "$DIR/bin/akatheon-ci" action

@@ -1,7 +1,7 @@
 # Akatheon Turbo. Copyright (c) 2026 Beaverise Inc. ("Akatheon"). All rights reserved. Patent Pending.
 # Use is governed by LICENSE.
 name: Akatheon Turbo
-description: Runs only the tests a change can affect, with a signed receipt of what ran and what was skipped
+description: Runs only the tests a change can affect, with a cryptographically signed receipt of what ran and what was skipped
 author: Akatheon
 branding:
   icon: zap
@@ -23,14 +23,20 @@ inputs:
     description: Override the revision the certificates describe (default - the one recorded with them)
     default: ""
   signing-key:
-    description: Ed25519 seed (64 hex characters) from a secret, to sign receipts; without one a fresh key signs
+    description: A private signing seed (64 hex characters) from a secret, to sign receipts; without one a fresh key signs
     default: ""
   license-key:
     description: "Your Akatheon Turbo key (secrets.AKATHEON_CI_TOKEN). Public repositories need none; a private one without a valid key runs every test, with a notice, and never fails because of it"
     default: ""
   telemetry:
-    description: "on (default with a key): the run's numeric summary (counts, seconds, commit and receipt hashes; never code, paths, test names or logs) goes to Akatheon, which also checks the subscription before the run | off"
+    description: "on (default with a key): the run's numeric summary (counts, seconds, commit and receipt hashes; never code, paths, test names or logs) goes to Akatheon, which also checks the subscription before the run | off (Enterprise keys only)"
     default: "on"
+  job-key:
+    description: "Matrix workflows: ${{ toJSON(matrix) }}, so each matrix job's summary counts once"
+    default: ""
+  backstop:
+    description: "none | merge-queue (on the merge queue's run, merge_group, every test runs as the last check before a merge)"
+    default: none
 outputs:
   selected:
     description: Tests selected
@@ -63,6 +69,9 @@ runs:
         AKCI_SIGNING_KEY: ${{ inputs.signing-key }}
         AKCI_LICENSE_KEY: ${{ inputs.license-key }}
         AKCI_TELEMETRY: ${{ inputs.telemetry }}
+        AKCI_JOB_KEY: ${{ inputs.job-key }}
+        AKCI_BACKSTOP: ${{ inputs.backstop }}
+        AKCI_GITHUB_TOKEN: ${{ github.token }}
       run: bash "${{ github.action_path }}/run.sh"
     - name: Save certificates
       if: inputs.mode == 'record' || inputs.mode == 'refresh'

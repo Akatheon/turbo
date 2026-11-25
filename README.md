@@ -1,6 +1,7 @@
 # Akatheon Turbo
 
-Runs only the tests a pull request can affect, and signs a receipt of what ran, what was skipped and why.
+Runs only the tests a pull request can affect, with cryptographically signed receipts of what ran, what was skipped
+and why.
 
 Start in **shadow** mode: your full suite still runs, and the job summary shows what Akatheon Turbo would have skipped
 and whether skipping it would have missed a failure. Switch a job to **enforce** when you trust what you see.
@@ -41,11 +42,10 @@ jobs:
 ```
 
 The first `refresh` on main records certificates for every test; later ones update only what each merge touched.
-Recording runs each test in a fork of a process that has already set up its session, package and module fixtures, so a
-fixture that builds a wheel or starts a server runs once per recording process, not once per test. When your command
-uses `-n` (pytest-xdist), recording processes are told they are xdist workers, so your conftest's guards for parallel
-workers still hold. A test that cannot run in a fork (one that crashes, hangs or never finishes there, as with PyTorch's
-thread pools) is recorded again alone, in a process of its own.
+Recording sets up your session, package and module fixtures once per recording process, so a fixture that builds a
+wheel or starts a server runs once per process, not once per test. When your command uses `-n` (pytest-xdist), your
+conftest's guards for parallel workers still hold. A test that cannot be recorded alongside others is recorded again on
+its own.
 Certificates live in GitHub's Actions cache. A pull request whose base has none (GitHub evicts cache entries unused
 for 7 days) runs the full suite and says so.
 
@@ -55,12 +55,14 @@ for 7 days) runs the full suite and says so.
 |---|---|---|
 | `mode` | `shadow` | `shadow`, `enforce`, `record` or `refresh` |
 | `command` | (required) | your test command, as you run it today |
-| `file-mode` | | `record` and `refresh`: test files to record in one process instead of a fork per test, one per line (rarely needed: shared fixtures are set up once already) |
+| `file-mode` | | `record` and `refresh`: test files to record whole, in one process, one per line (rarely needed: shared fixtures are set up once already) |
 | `certs-dir` | `.akatheon-ci` | where certificates live on the runner |
 | `base` | | override the revision the certificates describe |
-| `signing-key` | | an Ed25519 seed (64 hex characters) from a secret, to sign receipts with your key |
+| `signing-key` | | a private signing seed (64 hex characters) from a secret, to sign receipts with your own key |
 | `license-key` | | your Akatheon Turbo key, from a secret; public repositories need none |
-| `telemetry` | `on` | with a key: the run's numeric summary goes to Akatheon (below); `off` sends nothing |
+| `telemetry` | `on` | with a key: the run's numeric summary goes to Akatheon (below); `off` sends nothing (Enterprise keys; with Team and Growth keys it stays on) |
+| `job-key` | | in a matrix workflow, `${{ toJSON(matrix) }}`, so each matrix job's summary counts once |
+| `backstop` | `none` | `merge-queue`: on the merge queue's run (`merge_group`), every test runs, as the last check before a merge; pull requests still run the selection |
 
 Outputs: `selected`, `known` (tests with certificates) and `receipt` (the signed receipt's path).
 
@@ -73,10 +75,12 @@ Outputs: `selected`, `known` (tests with certificates) and `receipt` (the signed
 
 ## Licence keys
 
-- **Public repositories:** free, in every mode, with no key.
+- **Public repositories:** free, in every mode, with no key. Public means GitHub says so: without a valid key, the
+  action asks GitHub's API about the repository before the tests (with the job's own token), and if GitHub cannot be
+  reached the run counts as private.
 - **Private repositories:** a key from [turbo.akatheon.com](https://turbo.akatheon.com), stored as the secret
-  `AKATHEON_CI_TOKEN`. A trial key runs `shadow`, `record` and `refresh` (a trial's `enforce` runs as `shadow`); Team and
-  Growth keys run everything.
+  `AKATHEON_CI_TOKEN`. A trial key runs `shadow`, `record` and `refresh` (a trial's `enforce` runs as `shadow`); Team,
+  Growth and Enterprise keys run everything. An upgrade or a renewal takes effect without changing the secret.
 - **Without a valid key** (none, expired, another organization's, or a subscription that ended), every test runs and the
   job summary says why. The job's result is always your tests' result: Turbo never fails a build over its licence.
 
@@ -92,10 +96,12 @@ with that key (Akatheon's own credential), limited to 5 seconds and never able t
 numeric summary:
 - test counts and seconds;
 - the commit and the receipt's SHA-256 and signature;
-- GitHub's numeric repository ID, run ID and pull request number.
+- GitHub's numeric repository ID, run ID and pull request number, and a hash of the job's name (and of `job-key`);
+- the same numbers in a canonical form, signed with the receipt's key, so they can be checked without the receipt.
 
-Without a key, nothing is sent. Model API keys (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`,
-`GOOGLE_API_KEY`) are removed from the test processes it starts, so a run never bills a model.
+Without a key, nothing is sent to Akatheon. Model API keys (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`,
+`GOOGLE_API_KEY`, `AZURE_API_KEY`), the licence key and the signing key are removed from the test processes it starts,
+so a run never bills a model.
 
 ## See it run
 
