@@ -25,6 +25,12 @@ library and output (including certificates and receipts) they contain or produce
    (f) publish or disclose benchmarks or performance comparisons of the Software without the prior written
        consent of Beaverise Inc.
 
+   Notwithstanding Section 2(f), You may publicly report a reproducible deterministic false negative (a test failure
+   caught by a full-suite run on the same commit and environment that the Software skipped in `enforce` mode)
+   observed on a public open-source repository, provided the report includes the commit SHA, workflow configuration,
+   and steps to reproduce. All throughput, latency, or competitive performance benchmarking remains subject to prior
+   written consent.
+
 3. Ownership. The Software is licensed, not sold. Beaverise Inc. and its licensors keep all right, title and
    interest in the Software, including all intellectual property rights.
 
